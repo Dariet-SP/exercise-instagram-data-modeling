@@ -5,26 +5,74 @@ from sqlalchemy.orm import relationship, declarative_base
 from sqlalchemy import create_engine
 from eralchemy2 import render_er
 
+
 Base = declarative_base()
 
-class Person(Base):
-    __tablename__ = 'person'
-    # Here we define columns for the table person
-    # Notice that each column is also a normal Python instance attribute.
+class User(Base):
+    __tablename__ = 'users'
     id = Column(Integer, primary_key=True)
-    name = Column(String(250), nullable=False)
+    username = Column(String)
+    email = Column(String)
+    password = Column(String)
+    bio = Column(String)
+    profile_pic = Column(String)
 
-class Address(Base):
-    __tablename__ = 'address'
-    # Here we define columns for the table address.
-    # Notice that each column is also a normal Python instance attribute.
+class Post(Base):
+    __tablename__ = 'posts'
     id = Column(Integer, primary_key=True)
-    street_name = Column(String(250))
-    street_number = Column(String(250))
-    post_code = Column(String(250), nullable=False)
-    person_id = Column(Integer, ForeignKey('person.id'))
-    person = relationship(Person)
+    user_id = Column(Integer, ForeignKey('users.id'))
+    user = relationship('User', backref='posts')
+    caption = Column(String)
 
+
+class Media(Base):
+    __tablename__ = 'media'
+    id = Column(Integer, primary_key=True)
+    post_id = Column(Integer, ForeignKey('posts.id'))
+    post = relationship('Post', backref='media')
+    media_type = Column(String)
+    media_url = Column(String)
+
+class Like(Base):
+    __tablename__ = 'likes'
+    id = Column(Integer, primary_key=True)
+    post_id = Column(Integer, ForeignKey('posts.id'))
+    post = relationship('Post', backref='likes')
+    user_id = Column(Integer, ForeignKey('users.id'))
+    user = relationship('User', backref='likes')
+
+class Comment(Base):
+    __tablename__ = 'comments'
+    id = Column(Integer, primary_key=True)
+    post_id = Column(Integer, ForeignKey('posts.id'))
+    post = relationship('Post', backref='comments')
+    user_id = Column(Integer, ForeignKey('users.id'))
+    user = relationship('User', backref='comments')
+    comment_text = Column(String)
+
+class Favorite(Base):
+    __tablename__ = 'favorites'
+    id = Column(Integer, primary_key=True)
+    post_id = Column(Integer, ForeignKey('posts.id'))
+    post = relationship('Post', backref='favorites')
+    user_id = Column(Integer, ForeignKey('users.id'))
+    user = relationship('User', backref='favorites')
+
+class Share(Base):
+    __tablename__ = 'shares'
+    id = Column(Integer, primary_key=True)
+    post_id = Column(Integer, ForeignKey('posts.id'))
+    post = relationship('Post', backref='shares')
+    user_id = Column(Integer, ForeignKey('users.id'))
+    user = relationship('User', backref='shares')
+
+class InstagramState(Base):
+    __tablename__ = 'instagram_states'
+    id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey('users.id'))
+    user = relationship('User', backref='instagram_states')
+    state_type = Column(String)
+    state_text = Column(String)
     def to_dict(self):
         return {}
 
